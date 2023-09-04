@@ -1,0 +1,6 @@
+*.fs.tsx
+*.fs.tsx.map
+node_modules/
+obj/
+bin/
+.idea/
