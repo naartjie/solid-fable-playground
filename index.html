@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fable</title>
+    <style>
+        table, th, td {
+            border: 1px solid white;
+            border-collapse: collapse;
+        }
+        th, td {
+            background-color: #96D4D4;
+            animation: red-animate 1.2s linear;
+        }
+
+        @keyframes append-animate {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes red-animate {
+            0%     {background-color:red;}
+            100.0%  {background-color:#ffffff;}
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-root"></div>
+<script type="module" src="/App.fs.tsx"></script>
+</body>
+</html>

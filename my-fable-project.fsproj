@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Components.fs" />
+    <Compile Include="App.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elmish.Solid" Version="1.0.0-beta-002" />
+    <PackageReference Include="Fable.Browser.Dom" Version="2.14.0" />
+    <PackageReference Include="Fable.Core" Version="4.0.0" />
+    <PackageReference Include="Fable.Solid" Version="1.0.0-beta-004" />
+    <PackageReference Include="Feliz.JSX.Solid" Version="1.0.0-beta-002" />
+  </ItemGroup>
+
+</Project>

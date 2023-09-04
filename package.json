@@ -1,0 +1,18 @@
+{
+  "name": "my-fable-project",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "dotnet fable watch --lang typescript --sourceMaps --outDir ./ --extension .fs.tsx --run npx vite",
+    "_start": "dotnet fable watch --lang javascript --sourceMaps --outDir ./ --extension .fs.jsx --run npx vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^4.4.2",
+    "vite-plugin-solid": "^2.7.0"
+  },
+  "dependencies": {
+    "solid-js": "^1.7.7"
+  }
+}
