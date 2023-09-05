@@ -8,7 +8,27 @@ open Fable.Core
 open Elmish
 open Elmish.Solid
 open Fable.Core.JsInterop
-open Feliz.JSX.Solid
+
+[<JSX.Component>]
+let DivTxt (txt: string) =
+    let style, setStyle = Solid.createSignal ""
+
+    let ref = Solid.createRef<HTMLDivElement> ()
+
+    let () =
+        Solid.createEffect (fun _ ->
+            ref.Value?style <- $"background-color: red ; __inject_txt_as_a_dependency__: {txt}"
+
+            let _ =
+                JS.setTimeout (fun _ -> ref.Value?style <- "background-color: #96D4D4;") 1000
+
+            ())
+
+    JSX.jsx
+        $"""
+            <div ref={fun el -> ref.Value <- el}>{txt}</div>
+            """
+
 
 module Table =
     type Row =
@@ -27,7 +47,9 @@ module Table =
         | Rsvp
 
     type Msg =
-        | Add
+        | Add1
+        | AddX of int
+        | Reset
         | Modify of int * Field
 
     let rando () =
@@ -37,32 +59,15 @@ module Table =
           Age = int (x * 100.0)
           Rsvp = x > 0.5 }
 
-    [<JSX.Component>]
-    let DivTxt (txt: string) =
-        let style, setStyle = Solid.createSignal ""
-
-        let reference = Solid.createRef<HTMLDivElement> ()
-
-        let () =
-            Solid.createEffect (fun _ ->
-                JS.console.log $"rerender div with {txt}"
-                reference.Value?style <- "background-color: red"
-
-                let _ =
-                    JS.setTimeout (fun _ -> reference.Value?style <- "background-color: #96D4D4;") 1000
-
-                ())
-
-        Html.div [ Solid.ref reference; Html.children [ Html.text txt ] ]
 
     [<JSX.Component>]
     let RowCmp (row: Row) idx dispatch =
         JSX.jsx
             $"""
             <tr style={"cursor: pointer"}>
-                <td onclick={fun _ -> Modify(idx (), Field.Name) |> dispatch}><Table_DivTxt txt={row.Name}></Table_DivTxt></td>
-                <td onclick={fun _ -> Modify(idx (), Field.Age) |> dispatch}><Table_DivTxt txt={row.Age} /></td>
-                <td onclick={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}><Table_DivTxt txt={if row.Rsvp then "YES" else "NO"} /></td>
+                <td onclick={fun _ -> Modify(idx (), Field.Name) |> dispatch}><DivTxt txt={row.Name} /></td>
+                <td onclick={fun _ -> Modify(idx (), Field.Age) |> dispatch}><DivTxt txt={row.Age} /></td>
+                <td onclick={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}><DivTxt txt={if row.Rsvp then "YES" else "NO"} /></td>
             </tr>
             """
 
@@ -78,9 +83,16 @@ module Table =
 
         let update msg state =
             match msg with
-            | Add ->
+            | Reset -> init ()
+            | Add1 ->
                 { state with
                     Rows = (state.Rows, [| rando () |]) ||> Array.append },
+                Cmd.none
+            | AddX numberOfRows ->
+                let newRows = (fun _idx -> rando ()) |> Array.init numberOfRows
+
+                { state with
+                    Rows = (state.Rows, newRows) ||> Array.append },
                 Cmd.none
             | Modify(rowNo, field) ->
                 { state with
@@ -99,13 +111,16 @@ module Table =
                 Cmd.none
 
         let state, dispatch = Solid.createElmishStore (init, update)
+        let input = Solid.createRef<HTMLInputElement> ()
 
         JSX.jsx
             $"""
             <>
-                <button onclick={fun _ -> dispatch Add}>
+                <input ref={fun el -> input.Value <- el} />
+                <button onclick={fun _ -> input.Value.value |> int |> AddX |> dispatch} >
                     +
                 </button>
+                <button onClick={fun _ -> dispatch Reset}>Reset</button>
                 <table>
                     <thead>
                         <tr>
