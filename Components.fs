@@ -1,5 +1,6 @@
 module Components
 
+open System
 open Browser.Types
 
 printfn $"Loading {__SOURCE_FILE__}..."
@@ -10,17 +11,18 @@ open Elmish.Solid
 open Fable.Core.JsInterop
 
 [<JSX.Component>]
-let DivTxt (txt: string) =
+let FlashOnChangeDiv (txt: string) =
     let style, setStyle = Solid.createSignal ""
 
     let ref = Solid.createRef<HTMLDivElement> ()
 
     let () =
         Solid.createEffect (fun _ ->
-            ref.Value?style <- $"background-color: red ; __inject_txt_as_a_dependency__: {txt}"
+            // JS.console.log txt
+            ref.Value?style <- $"background-color: red; {txt}"
 
             let _ =
-                JS.setTimeout (fun _ -> ref.Value?style <- "background-color: #96D4D4;") 1000
+                1000 |> JS.setTimeout (fun _ -> ref.Value?style <- "background-color: #96D4D4;")
 
             ())
 
@@ -52,7 +54,7 @@ module Table =
         | Reset
         | Modify of int * Field
 
-    let rando () =
+    let randomNewRow () =
         let x = JS.Math.random ()
 
         { Name = System.Guid.NewGuid().ToString()
@@ -62,12 +64,17 @@ module Table =
 
     [<JSX.Component>]
     let RowCmp (row: Row) idx dispatch =
+        JS.console.log("RowCmp")
         JSX.jsx
             $"""
             <tr style={"cursor: pointer"}>
-                <td onclick={fun _ -> Modify(idx (), Field.Name) |> dispatch}><DivTxt txt={row.Name} /></td>
-                <td onclick={fun _ -> Modify(idx (), Field.Age) |> dispatch}><DivTxt txt={row.Age} /></td>
-                <td onclick={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}><DivTxt txt={if row.Rsvp then "YES" else "NO"} /></td>
+                <td onMouseOver={fun _ ->
+                    Modify(idx (), Field.Age) |> dispatch
+                    Modify(idx (), Field.Name) |> dispatch
+
+                    }><FlashOnChangeDiv txt={row.Name} /></td>
+                <td onclick={fun _ -> Modify(idx (), Field.Age) |> dispatch}><input value={row.Age} /></td>
+                <td onclick={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}><FlashOnChangeDiv txt={if row.Rsvp then "YES" else "NO"}/></td>
             </tr>
             """
 
@@ -86,10 +93,10 @@ module Table =
             | Reset -> init ()
             | Add1 ->
                 { state with
-                    Rows = (state.Rows, [| rando () |]) ||> Array.append },
+                    Rows = (state.Rows, [| randomNewRow () |]) ||> Array.append },
                 Cmd.none
             | AddX numberOfRows ->
-                let newRows = (fun _idx -> rando ()) |> Array.init numberOfRows
+                let newRows = (fun _idx -> randomNewRow ()) |> Array.init numberOfRows
 
                 { state with
                     Rows = (state.Rows, newRows) ||> Array.append },
@@ -100,7 +107,7 @@ module Table =
                         state.Rows
                         |> Array.mapi (fun idx row ->
                             if idx = rowNo then
-                                let newRow = rando ()
+                                let newRow = randomNewRow ()
 
                                 match field with
                                 | Name -> { row with Name = newRow.Name }
@@ -111,6 +118,16 @@ module Table =
                 Cmd.none
 
         let state, dispatch = Solid.createElmishStore (init, update)
+
+        // using signal
+        // let rows, _ = init ()
+        // let rows, setRows = Solid.createSignal rows
+        //
+        // let dispatch msg =
+        //     let newRows, _ = update msg (rows ())
+        //     setRows newRows
+
+
         let input = Solid.createRef<HTMLInputElement> ()
 
         JSX.jsx
