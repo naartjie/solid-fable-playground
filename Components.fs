@@ -1,10 +1,8 @@
 module Components
 
-open System
-open Browser.Types
-
 printfn $"Loading {__SOURCE_FILE__}..."
 
+open Browser.Types
 open Fable.Core
 open Elmish
 open Elmish.Solid
@@ -12,8 +10,6 @@ open Fable.Core.JsInterop
 
 [<JSX.Component>]
 let FlashOnChangeDiv (txt: string) =
-    let style, setStyle = Solid.createSignal ""
-
     let ref = Solid.createRef<HTMLDivElement> ()
 
     let () =
@@ -28,9 +24,8 @@ let FlashOnChangeDiv (txt: string) =
 
     JSX.jsx
         $"""
-            <div ref={fun el -> ref.Value <- el}>{txt}</div>
-            """
-
+        <div ref={fun el -> ref.Value <- el}>{txt}</div>
+        """
 
 module Table =
     type Row =
@@ -64,7 +59,8 @@ module Table =
 
     [<JSX.Component>]
     let RowCmp (row: Row) idx dispatch =
-        JS.console.log("RowCmp")
+        JS.console.log "RowCmp"
+
         JSX.jsx
             $"""
             <tr style={"cursor: pointer"}>
@@ -77,7 +73,6 @@ module Table =
                 <td onclick={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}><FlashOnChangeDiv txt={if row.Rsvp then "YES" else "NO"}/></td>
             </tr>
             """
-
 
     [<JSX.Component>]
     let Table () =
@@ -140,11 +135,11 @@ module Table =
                 <button onClick={fun _ -> dispatch Reset}>Reset</button>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th>RSVP</th>
-                        </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>RSVP</th>
+                    </tr>
                     </thead>
                     <tbody>
                         {Solid.For(state.Rows, (fun p idx -> RowCmp p idx dispatch))}
