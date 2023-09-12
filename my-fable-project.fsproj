@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="Components.fs" />
     <Compile Include="App.fs" />
+    <TypeScriptCompile Include="File.tsx" />
   </ItemGroup>
 
   <ItemGroup>

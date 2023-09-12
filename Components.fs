@@ -63,14 +63,20 @@ module Table =
 
         JSX.jsx
             $"""
-            <tr style={"cursor: pointer"}>
-                <td onMouseOver={fun _ ->
-                    Modify(idx (), Field.Age) |> dispatch
-                    Modify(idx (), Field.Name) |> dispatch
+            import {{FlashOnChangeDiv}} from "./Components.fs.tsx";
 
-                    }><FlashOnChangeDiv txt={row.Name} /></td>
-                <td onclick={fun _ -> Modify(idx (), Field.Age) |> dispatch}><input value={row.Age} /></td>
-                <td onclick={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}><FlashOnChangeDiv txt={if row.Rsvp then "YES" else "NO"}/></td>
+            <tr style={"cursor: pointer"}>
+                <td>
+                    <button onMouseOver={fun _ -> Modify(idx (), Field.Name) |> dispatch}>Update</button>
+                    <FlashOnChangeDiv txt={row.Name}/>
+                </td>
+                <td>
+                    <button onMouseOver={fun _ -> Modify(idx (), Field.Age) |> dispatch}>Update</button>
+                    <input value={row.Age}/></td>
+                <td>
+                    <button onMouseOver={fun _ -> Modify(idx (), Field.Rsvp) |> dispatch}>Update</button>
+                    <FlashOnChangeDiv txt={if row.Rsvp then "YES" else "NO"}/>
+                </td>
             </tr>
             """
 
@@ -107,7 +113,7 @@ module Table =
                                 match field with
                                 | Name -> { row with Name = newRow.Name }
                                 | Age -> { row with Age = newRow.Age }
-                                | Rsvp -> { row with Rsvp = newRow.Rsvp }
+                                | Rsvp -> { row with Rsvp = not row.Rsvp }
                             else
                                 row) },
                 Cmd.none
@@ -115,24 +121,29 @@ module Table =
         let state, dispatch = Solid.createElmishStore (init, update)
 
         // using signal
-        // let rows, _ = init ()
-        // let rows, setRows = Solid.createSignal rows
+        // let state, _ = init ()
+        // let state, setState = Solid.createSignal state
         //
         // let dispatch msg =
-        //     let newRows, _ = update msg (rows ())
-        //     setRows newRows
-
+        //     let newRows, _ = update msg (state ())
+        //     setState newRows
 
         let input = Solid.createRef<HTMLInputElement> ()
 
         JSX.jsx
-            $"""
+            $"""/** @jsxImportSource solid-js */
+
+            import {{MyComponent}} from "./File";
+
             <>
-                <input ref={fun el -> input.Value <- el} />
-                <button onclick={fun _ -> input.Value.value |> int |> AddX |> dispatch} >
+                <MyComponent  />
+
+                <input ref={fun el -> input.Value <- el}/>
+                <button onclick={fun _ -> input.Value.value |> int |> AddX |> dispatch}>
                     +
                 </button>
-                <button onClick={fun _ -> dispatch Reset}>Reset</button>
+
+                <button onclick={fun _ -> dispatch Reset}>Reset</button>
                 <table>
                     <thead>
                     <tr>
